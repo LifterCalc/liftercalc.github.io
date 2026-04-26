@@ -192,6 +192,10 @@
     function formatNumber(value, precision) {
       return Number(value.toFixed(precision)).toString();
     }
+
+    function isTypingDecimal(value) {
+      return /\.$|\.\d*0$/.test(value);
+    }
   </script>
   <script>
     const unitFrom = document.querySelector('#unit-select-from');
@@ -245,7 +249,7 @@
       }
 
       const sourceFormatted = formatNumber(sourceValue, 2);
-      if (sourceFormatted !== source.value) {
+      if (sourceFormatted !== source.value && !isTypingDecimal(source.value)) {
         source.value = sourceFormatted;
       }
 
@@ -306,7 +310,7 @@
       const targetReps = parseInt((reversed ? repsFrom : repsTo).value);
 
       const sourceFormatted = formatNumber(sourceWeight, 1);
-      if (sourceFormatted !== source.value) {
+      if (sourceFormatted !== source.value && !isTypingDecimal(source.value)) {
         source.value = sourceFormatted;
       }
 

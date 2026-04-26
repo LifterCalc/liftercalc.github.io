@@ -1,28 +1,26 @@
+const cacheName = 'v2';
+
 self.addEventListener('install', event => {
-  console.log('Service Worker installing...');
   event.waitUntil(
-    caches.open('v1').then(cache => {
-      return cache.addAll([
-        '/',
-        '/index.html',
-        '/manifest.webmanifest',
-      ]);
-    })
+    caches.open(cacheName).then(cache => cache.addAll([
+      '/',
+      '/index.html',
+      '/manifest.webmanifest',
+    ]))
   );
+  self.skipWaiting();
 });
 
-self.addEventListener('activate', () => {
-  console.log('Service Worker activated.');
+self.addEventListener('activate', event => {
+  event.waitUntil(
+    caches.keys().then(keys =>
+      Promise.all(keys.filter(k => k !== cacheName).map(k => caches.delete(k)))
+    ).then(() => self.clients.claim())
+  );
 });
 
 self.addEventListener('fetch', event => {
   event.respondWith(
-    caches.match(event.request).then(cachedResponse => {
-      if (cachedResponse) {
-        return cachedResponse;
-      }
-
-      return fetch(event.request);
-    })
+    caches.match(event.request).then(cached => cached ?? fetch(event.request))
   );
 });
